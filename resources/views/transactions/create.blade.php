@@ -7,25 +7,37 @@
     </x-slot:actions>
 
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)]">
-        <form data-demo-form class="surface p-6 sm:p-8">
+        <form method="POST" action="{{ route('transactions.store') }}" class="surface p-6 sm:p-8">
+            @csrf
+            
+            @if($errors->any())
+                <div class="mb-6 rounded-lg bg-red-50 p-4 text-sm font-medium text-red-800">
+                    {{ $errors->first() }}
+                </div>
+            @endif
+            @if(session('success'))
+                <div class="mb-6 rounded-lg bg-green-50 p-4 text-sm font-medium text-green-800">
+                    {{ session('success') }}
+                </div>
+            @endif
             <div class="grid gap-5 md:grid-cols-2">
                 <label class="block md:col-span-2">
                     <span class="field-label">Título do lançamento</span>
-                    <input class="field-control" type="text" placeholder="Ex: Compra de materiais para oficina">
+                    <input name="description" required class="field-control" type="text" placeholder="Ex: Compra de materiais para oficina">
                 </label>
 
                 <fieldset class="md:col-span-2">
                     <legend class="field-label">Tipo de movimentação</legend>
                     <div class="mt-2 grid gap-3 sm:grid-cols-2">
                         <label class="quiet-surface flex cursor-pointer items-center gap-3 p-4 transition hover:border-action">
-                            <input type="radio" name="type" class="text-action focus:ring-action" checked>
+                            <input type="radio" value="entrada" name="type" class="text-action focus:ring-action" checked>
                             <span>
                                 <span class="block text-sm font-extrabold text-ink">Receita</span>
                                 <span class="block text-xs font-semibold text-muted">Doações, repasses e entradas</span>
                             </span>
                         </label>
                         <label class="quiet-surface flex cursor-pointer items-center gap-3 p-4 transition hover:border-action">
-                            <input type="radio" name="type" class="text-action focus:ring-action">
+                            <input type="radio" value="saida" name="type" class="text-action focus:ring-action">
                             <span>
                                 <span class="block text-sm font-extrabold text-ink">Despesa</span>
                                 <span class="block text-xs font-semibold text-muted">Gastos, reembolsos e pagamentos</span>
@@ -36,7 +48,7 @@
 
                 <label class="block">
                     <span class="field-label">Valor (R$)</span>
-                    <input class="field-control" type="text" inputmode="decimal" placeholder="0,00">
+                    <input name="amount" required class="field-control" type="number" step="0.01" placeholder="0.00">
                 </label>
 
                 <label class="block">
@@ -46,7 +58,7 @@
 
                 <label class="block md:col-span-2">
                     <span class="field-label">Categoria do fluxo</span>
-                    <select class="field-control">
+                    <select name="payment_method" class="field-control">
                         <option>Selecione uma categoria</option>
                         @foreach ($categories as $category)
                             <option>{{ $category }}</option>

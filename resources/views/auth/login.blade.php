@@ -36,20 +36,28 @@
                     </p>
                 </div>
 
-                <form method="GET" action="{{ route('dashboard') }}" class="space-y-5">
+                <form method="POST" action="{{ route('login') }}" class="space-y-5">
+                    @csrf
+
+                    @if($errors->any())
+                        <div class="rounded-lg bg-red-50 p-4 text-sm font-medium text-red-800">
+                            {{ $errors->first() }}
+                        </div>
+                    @endif
+
                     <label class="block">
                         <span class="field-label">E-mail institucional</span>
-                        <input class="field-control" type="email" name="email" value="admin@institutojp2.org.br" autocomplete="email">
+                        <input class="field-control" type="email" name="email" value="admin@example.com" autocomplete="email">
                     </label>
 
                     <label class="block">
                         <span class="field-label">Senha</span>
-                        <input class="field-control" type="password" name="password" value="institutojp2" autocomplete="current-password">
+                        <input class="field-control" type="password" name="password" value="password" autocomplete="current-password">
                     </label>
 
                     <div class="flex items-center justify-between gap-4">
                         <label class="flex items-center gap-2 text-sm font-semibold text-slate-600">
-                            <input type="checkbox" class="rounded border-line text-action focus:ring-action" checked>
+                            <input type="checkbox" name="remember" class="rounded border-line text-action focus:ring-action" checked>
                             Manter acesso neste dispositivo
                         </label>
                         <a href="#" class="text-sm font-bold text-action hover:text-navy-900">Ajuda</a>
@@ -59,7 +67,7 @@
                 </form>
 
                 <p class="mt-8 rounded-lg bg-slate-50 p-4 text-xs font-semibold leading-5 text-muted">
-                    Protótipo front-end: o botão acessa o painel demonstrativo sem autenticação real.
+                    Backend integrado! Use os dados preenchidos acima para testar.
                 </p>
             </div>
         </section>

@@ -3,7 +3,21 @@
     subtitle="Acompanhe saldo, movimentações recentes e distribuição de gastos do fluxo de caixa institucional."
 >
     <x-slot:actions>
-        <a href="{{ route('transactions.create') }}" class="primary-button">Novo lançamento</a>
+        @if(\App\Models\CashRegister::where('user_id', Auth::id())->where('status', 'aberto')->exists())
+            <form action="{{ route('cash_register.close') }}" method="POST" class="inline-block mt-2 sm:mt-0">
+                @csrf
+                <button type="submit" class="secondary-button !border-red-300 !text-red-700 hover:!bg-red-50">Fechar Caixa Ativo</button>
+            </form>
+            <a href="{{ route('transactions.create') }}" class="primary-button">Novo lançamento</a>
+        @else
+            <form action="{{ route('cash_register.open') }}" method="POST" class="inline-block mt-2 sm:mt-0">
+                @csrf
+                <input type="hidden" name="opening_balance" value="150.00">
+                <button type="submit" class="secondary-button !border-green-300 !text-green-700 hover:!bg-green-50">Abrir Caixa (Teste: Iniciar com $150)</button>
+            </form>
+            <button onclick="alert('Abra um caixa primeiro!')" class="primary-button opacity-50 cursor-not-allowed">Novo lançamento</button>
+        @endif
+        
         <a href="{{ route('transactions.index') }}" class="secondary-button">Ver extrato</a>
     </x-slot:actions>
 
