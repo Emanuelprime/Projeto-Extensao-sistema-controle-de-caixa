@@ -2,53 +2,22 @@
     title="Relatórios"
     subtitle="Centralize exportações para auditoria, prestação de contas e conferência mensal."
 >
-    <x-slot:actions>
-        <button type="button" class="secondary-button">Atualizar dados</button>
-    </x-slot:actions>
-
-    <div class="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.85fr)]">
-        <section class="surface p-6 sm:p-8">
-            <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-                <div>
-                    <p class="eyebrow">Distribuição mensal</p>
-                    <h2 class="mt-2 font-display text-3xl font-black text-navy-900">R$ 142.450,00</h2>
-                    <p class="mt-2 text-sm font-bold text-emerald-700">+12% vs mês anterior</p>
-                </div>
-                <div class="flex rounded-lg border border-line bg-slate-50 p-1">
-                    <button class="rounded-lg bg-white px-4 py-2 text-xs font-extrabold uppercase text-action shadow-sm">Mensal</button>
-                    <button class="px-4 py-2 text-xs font-extrabold uppercase text-slate-500">Trimestral</button>
-                    <button class="px-4 py-2 text-xs font-extrabold uppercase text-slate-500">Anual</button>
-                </div>
-            </div>
-
-            <div class="mt-8 space-y-5">
-                @foreach ($distribution as $item)
-                    <div>
-                        <div class="flex items-center justify-between text-sm font-bold">
-                            <span>{{ $item['label'] }}</span>
-                            <span>{{ $item['value'] }}%</span>
-                        </div>
-                        <div class="mt-2 h-3 rounded-full bg-slate-100">
-                            <div class="h-3 rounded-full bg-navy-900" style="width: {{ $item['value'] }}%"></div>
-                        </div>
-                    </div>
-                @endforeach
-            </div>
-        </section>
-
-        <aside class="surface p-6 sm:p-8">
+    <section class="surface p-6 sm:p-8">
+        <div class="flex flex-col gap-6 lg:flex-row lg:items-center lg:justify-between">
+            <div class="max-w-2xl">
             <p class="eyebrow">Exportação financeira</p>
             <h2 class="mt-3 text-2xl font-extrabold leading-tight text-ink">Arquivos consolidados para auditoria</h2>
             <p class="mt-3 text-sm font-medium leading-6 text-muted">
-                Gere relatórios em PDF ou CSV quando o back-end de exportação estiver conectado.
+                Gere relatórios em PDF ou CSV para conferência financeira e prestação de contas.
             </p>
-
-            <div class="mt-8 space-y-3">
-                <button type="button" class="primary-button w-full">Relatório completo (PDF)</button>
-                <button type="button" class="secondary-button w-full">Dados brutos (CSV)</button>
             </div>
-        </aside>
-    </div>
+
+            <div class="flex flex-col gap-3 sm:flex-row lg:flex-col">
+                <button type="button" class="primary-button">Relatório completo (PDF)</button>
+                <button type="button" class="secondary-button">Dados brutos (CSV)</button>
+            </div>
+        </div>
+    </section>
 
     <section class="mt-6 surface overflow-hidden">
         <div class="flex flex-col gap-3 border-b border-line px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
@@ -94,16 +63,6 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
-    </section>
-
-    <section class="mt-6 quiet-surface p-5">
-        <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
-            <div class="grid gap-4 sm:grid-cols-2">
-                <p class="text-sm font-semibold text-muted"><span class="font-extrabold text-ink">Total em cache:</span> R$ 1.2M</p>
-                <p class="text-sm font-semibold text-muted"><span class="font-extrabold text-ink">Exportados hoje:</span> 04 arq.</p>
-            </div>
-            <p class="text-sm font-semibold text-muted">Última atualização: hoje às 14:30</p>
         </div>
     </section>
 </x-admin-layout>

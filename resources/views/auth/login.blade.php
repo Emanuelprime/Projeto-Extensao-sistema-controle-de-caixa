@@ -66,9 +66,6 @@
                     <button type="submit" class="primary-button w-full">Entrar no painel</button>
                 </form>
 
-                <p class="mt-8 rounded-lg bg-slate-50 p-4 text-xs font-semibold leading-5 text-muted">
-                    Backend integrado! Use os dados preenchidos acima para testar.
-                </p>
             </div>
         </section>
     </main>

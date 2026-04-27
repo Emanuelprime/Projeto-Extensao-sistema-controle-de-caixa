@@ -33,6 +33,10 @@ Route::middleware('auth')->group(function () {
     // Rotas de Relatórios ou Extras (ainda parciais)
     Route::get('/extrato', [TransactionController::class, 'index'])->name('transactions.index');
 
+    Route::get('/administradores/novo', function () {
+        return view('admin-users.create');
+    })->name('admins.create');
+
     Route::get('/relatorios', function () {
         $distribution = [
             ['label' => 'Folha e pessoal', 'value' => 45],

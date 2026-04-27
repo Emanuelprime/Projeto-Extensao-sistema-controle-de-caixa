@@ -80,11 +80,6 @@
                     </label>
                 </div>
             </div>
-
-            <div data-demo-notice class="mt-6 hidden rounded-lg bg-blue-50 p-4 text-sm font-semibold text-action">
-                Lançamento validado visualmente. A gravação será conectada ao back-end na próxima etapa.
-            </div>
-
             <div class="mt-8 flex flex-col-reverse gap-3 sm:flex-row sm:justify-end">
                 <button type="reset" class="secondary-button">Cancelar</button>
                 <button type="submit" class="primary-button">Confirmar registro</button>
@@ -92,23 +87,11 @@
         </form>
 
         <aside class="space-y-6">
-            <section class="surface p-6">
-                <p class="eyebrow">Saldo atual</p>
-                <p class="mt-3 font-display text-3xl font-black text-navy-900">R$ 145.200,50</p>
-                <p class="mt-2 text-sm font-semibold text-muted">Valor de demonstração antes da gravação.</p>
-            </section>
-
-            <section class="quiet-surface p-6">
-                <p class="eyebrow">Lançamentos hoje</p>
-                <p class="mt-3 font-display text-4xl font-black text-ink">08</p>
-                <p class="mt-2 text-sm font-semibold text-muted">Último acesso registrado às 14:25.</p>
-            </section>
-
             <section class="quiet-surface p-6">
                 <p class="eyebrow">Checklist interno</p>
                 <ul class="mt-4 space-y-3 text-sm font-semibold text-slate-600">
                     <li>Confirmar categoria antes do registro.</li>
-                    <li>Anexar recibo quando houver despesa.</li>
+                    <li>Anexar recibo ou comprovante.</li>
                     <li>Usar observações para auditoria futura.</li>
                 </ul>
             </section>

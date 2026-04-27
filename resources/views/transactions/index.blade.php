@@ -13,10 +13,16 @@
         @endforeach
     </div>
 
+    @php($transactionCount = count($transactions))
+
     <section class="mt-6 quiet-surface p-5">
-        <div class="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_auto] lg:items-end">
+        <div class="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_1fr_auto] lg:items-end">
             <label class="block">
                 <span class="field-label">Período inicial</span>
+                <input class="field-control" type="date">
+            </label>
+            <label class="block">
+                <span class="field-label">Período final</span>
                 <input class="field-control" type="date">
             </label>
             <label class="block">
@@ -44,7 +50,13 @@
         <div class="flex flex-col gap-4 border-b border-line px-6 py-5 md:flex-row md:items-center md:justify-between">
             <div>
                 <p class="eyebrow">Transações</p>
-                <h2 class="mt-1 text-xl font-extrabold text-ink">Mostrando 6 de 142 movimentações</h2>
+                <h2 class="mt-1 text-xl font-extrabold text-ink">
+                    @if ($transactionCount === 0)
+                        Nenhuma movimentação encontrada
+                    @else
+                        Mostrando {{ $transactionCount }} {{ $transactionCount === 1 ? 'movimentação' : 'movimentações' }}
+                    @endif
+                </h2>
             </div>
             <input type="search" class="field-control mt-0 max-w-sm" placeholder="Buscar transação...">
         </div>
@@ -76,15 +88,6 @@
                     @endforeach
                 </tbody>
             </table>
-        </div>
-
-        <div class="flex flex-col gap-3 px-6 py-5 sm:flex-row sm:items-center sm:justify-between">
-            <p class="text-sm font-semibold text-muted">Paginação demonstrativa</p>
-            <div class="flex gap-2">
-                <button class="secondary-button px-4 py-2">1</button>
-                <button class="secondary-button px-4 py-2">2</button>
-                <button class="secondary-button px-4 py-2">3</button>
-            </div>
         </div>
     </section>
 </x-admin-layout>

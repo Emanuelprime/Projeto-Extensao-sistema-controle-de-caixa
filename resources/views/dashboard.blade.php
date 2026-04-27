@@ -2,6 +2,13 @@
     title="Painel Principal"
     subtitle="Acompanhe saldo, movimentações recentes e distribuição de gastos do fluxo de caixa institucional."
 >
+    @php
+        $visibleTransactions = collect($transactions)->reject(function ($transaction) {
+            return ($transaction['category'] ?? '') === 'Teste'
+                || str($transaction['description'] ?? '')->lower()->contains('exemplo');
+        })->values();
+    @endphp
+
     <x-slot:actions>
         @if(\App\Models\CashRegister::where('user_id', Auth::id())->where('status', 'aberto')->exists())
             <form action="{{ route('cash_register.close') }}" method="POST" class="inline-block mt-2 sm:mt-0">
@@ -13,7 +20,7 @@
             <form action="{{ route('cash_register.open') }}" method="POST" class="inline-block mt-2 sm:mt-0">
                 @csrf
                 <input type="hidden" name="opening_balance" value="150.00">
-                <button type="submit" class="secondary-button !border-green-300 !text-green-700 hover:!bg-green-50">Abrir Caixa (Teste: Iniciar com $150)</button>
+                <button type="submit" class="secondary-button !border-green-300 !text-green-700 hover:!bg-green-50">Abrir caixa</button>
             </form>
             <button onclick="alert('Abra um caixa primeiro!')" class="primary-button opacity-50 cursor-not-allowed">Novo lançamento</button>
         @endif
@@ -48,7 +55,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        @foreach ($transactions as $transaction)
+                        @forelse ($visibleTransactions as $transaction)
                             <tr class="transition hover:bg-slate-50">
                                 <td class="table-cell font-bold text-slate-500">{{ $transaction['date'] }}</td>
                                 <td class="table-cell">
@@ -63,7 +70,13 @@
                                 ])>{{ $transaction['value'] }}</td>
                                 <td class="table-cell"><x-status-badge :status="$transaction['status']" /></td>
                             </tr>
-                        @endforeach
+                        @empty
+                            <tr>
+                                <td colspan="5" class="px-6 py-10 text-center text-sm font-semibold text-muted">
+                                    Nenhuma movimentação registrada neste caixa.
+                                </td>
+                            </tr>
+                        @endforelse
                     </tbody>
                 </table>
             </div>
@@ -85,28 +98,6 @@
                             </div>
                         </div>
                     @endforeach
-                </div>
-            </section>
-
-            <section class="quiet-surface p-6">
-                <p class="eyebrow">Meta mensal</p>
-                <div class="mt-4 flex items-center gap-4">
-                    <div class="flex h-16 w-16 items-center justify-center rounded-lg border border-line text-lg font-black text-action">82%</div>
-                    <div>
-                        <p class="text-sm font-bold uppercase text-slate-500">Prestação registrada</p>
-                        <p class="mt-1 font-display text-2xl font-black text-ink">R$ 55.000,00</p>
-                    </div>
-                </div>
-                <p class="mt-5 text-sm font-medium leading-6 text-muted">Faltam R$ 9.800,00 para fechar a meta prevista para o mês.</p>
-            </section>
-
-            <section class="quiet-surface p-5">
-                <div class="flex items-center justify-between gap-4">
-                    <div>
-                        <p class="eyebrow">Status conexão</p>
-                        <p class="mt-2 text-sm font-bold text-ink">Conciliação manual ativa</p>
-                    </div>
-                    <x-status-badge status="Liquidado" />
                 </div>
             </section>
         </aside>

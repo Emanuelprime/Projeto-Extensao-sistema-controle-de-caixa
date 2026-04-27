@@ -10,6 +10,17 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <title>{{ $title }} | Instituto JP II</title>
+    <script>
+        (function () {
+            try {
+                if (localStorage.getItem('jp-finance-sidebar-collapsed') === 'true') {
+                    document.documentElement.classList.add('sidebar-collapsed-preload');
+                }
+            } catch (error) {
+                document.documentElement.classList.remove('sidebar-collapsed-preload');
+            }
+        })();
+    </script>
     @vite(['resources/css/app.css', 'resources/js/app.js'])
 </head>
 <body>
@@ -28,42 +39,52 @@
         </button>
     </header>
 
-    <aside id="mobile-sidebar" data-mobile-sidebar class="fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col border-r border-line bg-white transition-transform duration-300 lg:w-64 lg:translate-x-0">
-        <div class="flex h-20 items-center justify-between px-6">
-            <a href="{{ route('dashboard') }}" class="flex items-center gap-3">
+    <aside id="mobile-sidebar" data-mobile-sidebar data-collapsible-sidebar class="sidebar-shell fixed inset-y-0 left-0 z-40 flex w-72 -translate-x-full flex-col border-r border-line bg-white transition-transform duration-300 lg:w-64 lg:translate-x-0 lg:transition-[width] lg:ease-out">
+        <div class="sidebar-header flex h-20 items-center justify-between px-6">
+            <a href="{{ route('dashboard') }}" class="sidebar-brand flex min-w-0 items-center gap-3">
                 <span class="flex h-10 w-10 items-center justify-center rounded-lg bg-navy-900 font-display text-sm font-black text-white">JP</span>
-                <span>
+                <span class="sidebar-brand-text min-w-0">
                     <span class="block text-sm font-extrabold uppercase tracking-[0.08em] text-navy-900">Sistema Financeiro</span>
                     <span class="block text-xs font-semibold text-muted">Instituto JP II</span>
                 </span>
             </a>
+            <button data-sidebar-toggle type="button" aria-expanded="true" aria-label="Recolher menu lateral" class="sidebar-toggle-button hidden h-9 w-9 items-center justify-center rounded-lg border border-line bg-white text-xl font-black leading-none text-navy-900 shadow-sm transition hover:border-action hover:text-action focus:outline-none focus:ring-2 focus:ring-action focus:ring-offset-2 lg:absolute lg:-right-4 lg:top-5 lg:z-50 lg:inline-flex">
+                <span data-sidebar-toggle-icon aria-hidden="true">&lsaquo;</span>
+            </button>
             <button data-mobile-close-button type="button" class="ghost-button lg:hidden">Fechar</button>
         </div>
 
-        <nav class="flex-1 space-y-1 px-4 py-4">
-            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')">Dashboard</x-nav-link>
-            <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.index')">Extrato</x-nav-link>
-            <x-nav-link :href="route('transactions.create')" :active="request()->routeIs('transactions.create')">Lançamento</x-nav-link>
-            <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')">Relatórios</x-nav-link>
+        <nav class="sidebar-nav flex-1 space-y-1 px-4 py-4">
+            <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="dashboard">Dashboard</x-nav-link>
+            <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.index')" icon="statement">Extrato</x-nav-link>
+            <x-nav-link :href="route('transactions.create')" :active="request()->routeIs('transactions.create')" icon="entry">Lançamento</x-nav-link>
+            <x-nav-link :href="route('admins.create')" :active="request()->routeIs('admins.create')" icon="admins">Admins</x-nav-link>
+            <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')" icon="reports">Relatórios</x-nav-link>
         </nav>
 
-        <div class="border-t border-line p-4">
-            <a href="{{ route('transactions.create') }}" class="primary-button w-full">Novo lançamento</a>
-            <div class="mt-6 rounded-lg bg-slate-50 p-4">
+        <div class="sidebar-footer border-t border-line p-4">
+            <div class="sidebar-footer-panel rounded-lg bg-slate-50 p-4">
                 <p class="eyebrow">Sessão interna</p>
                 <p class="mt-2 text-sm font-bold text-ink">Admin Financeiro</p>
                 <p class="text-xs font-medium text-muted">Dados demonstrativos</p>
             </div>
-            <a href="{{ route('login') }}" class="mt-3 flex rounded-lg px-3 py-2 text-sm font-bold text-slate-500 transition hover:bg-slate-50 hover:text-danger">Sair</a>
+            <a href="{{ route('login') }}" title="Sair" class="sidebar-logout mt-3 flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold text-slate-500 transition hover:bg-slate-50 hover:text-danger">
+                <svg class="sidebar-icon h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                    <path d="M16 17l5-5-5-5" />
+                    <path d="M21 12H9" />
+                </svg>
+                <span class="sidebar-label truncate">Sair</span>
+            </a>
         </div>
     </aside>
 
-    <main class="lg:pl-64">
+    <main data-main-content class="lg:pl-64 lg:transition-[padding] lg:duration-300 lg:ease-out">
         <div class="hidden h-16 items-center justify-between border-b border-line bg-white px-8 lg:flex">
-            <div class="relative w-full max-w-sm">
-                <span class="pointer-events-none absolute left-4 top-1/2 -translate-y-1/2 text-sm text-slate-400">Buscar</span>
-                <input type="search" class="field-control mt-0 pl-16" placeholder="transações, categorias, recibos...">
-            </div>
+            <form method="GET" action="{{ url()->current() }}" class="flex w-full max-w-xl items-center gap-2">
+                <input name="q" type="search" value="{{ request('q') }}" class="field-control mt-0" placeholder="Buscar transações, categorias, recibos...">
+                <button type="submit" class="primary-button shrink-0 px-5 py-3">Buscar</button>
+            </form>
             <div class="flex items-center gap-3">
                 <span class="text-right">
                     <span class="block text-sm font-bold text-ink">Admin User</span>
