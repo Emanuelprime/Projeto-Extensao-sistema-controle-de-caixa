@@ -21,7 +21,18 @@ class User extends Authenticatable
         'email',
         'password',
         'role',
+        'status',
     ];
+
+    public function isAdmin(): bool
+    {
+        return $this->role === 'admin';
+    }
+
+    public function isBlocked(): bool
+    {
+        return $this->status === 'bloqueado';
+    }
 
     /**
      * The attributes that should be hidden for serialization.

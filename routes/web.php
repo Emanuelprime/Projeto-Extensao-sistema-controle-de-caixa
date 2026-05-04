@@ -4,6 +4,8 @@ use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\AuthController;
 use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\TransactionController;
+use App\Http\Controllers\ReportController;
+use App\Http\Controllers\UserController;
 
 Route::redirect('/', '/login');
 
@@ -14,12 +16,14 @@ Route::get('/login', function () {
 Route::post('/login', [AuthController::class, 'login']);
 Route::post('/logout', [AuthController::class, 'logout'])->name('logout');
 
-// Rotas protegidas
+// ─── Rotas protegidas (usuário autenticado) ───────────────────────────────────
 Route::middleware('auth')->group(function () {
+
+    // Dashboard
     Route::get('/dashboard', [CashRegisterController::class, 'dashboard'])->name('dashboard');
-    
+
     // Ações de Caixa
-    Route::post('/caixa/abrir', [CashRegisterController::class, 'open'])->name('cash_register.open');
+    Route::post('/caixa/abrir',  [CashRegisterController::class, 'open'])->name('cash_register.open');
     Route::post('/caixa/fechar', [CashRegisterController::class, 'close'])->name('cash_register.close');
 
     // Transações
@@ -27,26 +31,28 @@ Route::middleware('auth')->group(function () {
         $categories = ['Doações', 'Repasses', 'Oficinas', 'Manutenção', 'Pessoal', 'Alimentação', 'Transporte', 'Materiais'];
         return view('transactions.create', compact('categories'));
     })->name('transactions.create');
-    
-    Route::post('/lancamentos', [TransactionController::class, 'store'])->name('transactions.store');
 
-    // Rotas de Relatórios ou Extras (ainda parciais)
+    Route::post('/lancamentos',              [TransactionController::class, 'store'])->name('transactions.store');
+    Route::delete('/lancamentos/{transaction}', [TransactionController::class, 'destroy'])->name('transactions.destroy');
+
+    // Extrato com filtros
     Route::get('/extrato', [TransactionController::class, 'index'])->name('transactions.index');
 
     Route::get('/administradores/novo', function () {
         return view('admin-users.create');
     })->name('admins.create');
 
-    Route::get('/relatorios', function () {
-        $distribution = [
-            ['label' => 'Folha e pessoal', 'value' => 45],
-            ['label' => 'Impostos e taxas', 'value' => 22],
-        ];
+    // Exportações
+    Route::get('/extrato/exportar-csv', [TransactionController::class, 'exportCsv'])->name('transactions.export_csv');
+    Route::get('/extrato/exportar-pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export_pdf');
 
-        $exports = [
-            ['document' => 'fechamento_mensal_out26', 'description' => 'Relatório de fluxo de caixa', 'date' => '01/11/2026 - 09:42', 'format' => 'PDF', 'size' => '2.4 MB', 'status' => 'Processado'],
-        ];
+    // Relatórios
+    Route::get('/relatorios', [ReportController::class, 'index'])->name('reports.index');
 
-        return view('reports.index', compact('distribution', 'exports'));
-    })->name('reports.index');
+    // ─── Gestão de Usuários (somente admin — verificado no controller) ────────
+    Route::get('/usuarios',              [UserController::class, 'index'])->name('users.index');
+    Route::get('/usuarios/novo',         [UserController::class, 'create'])->name('users.create');
+    Route::post('/usuarios',             [UserController::class, 'store'])->name('users.store');
+    Route::get('/usuarios/{user}/editar',[UserController::class, 'edit'])->name('users.edit');
+    Route::put('/usuarios/{user}',       [UserController::class, 'update'])->name('users.update');
 });

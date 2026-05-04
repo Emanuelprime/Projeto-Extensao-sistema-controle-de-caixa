@@ -16,10 +16,14 @@ class Transaction extends Model
         'amount',
         'description',
         'payment_method',
+        'receipt_path',
+        'competencia_date',
+        'notes',
     ];
 
     protected $casts = [
-        'amount' => 'decimal:2',
+        'amount'           => 'decimal:2',
+        'competencia_date' => 'date',
     ];
 
     /**

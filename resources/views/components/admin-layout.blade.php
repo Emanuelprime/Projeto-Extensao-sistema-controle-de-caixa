@@ -58,24 +58,29 @@
             <x-nav-link :href="route('dashboard')" :active="request()->routeIs('dashboard')" icon="dashboard">Dashboard</x-nav-link>
             <x-nav-link :href="route('transactions.index')" :active="request()->routeIs('transactions.index')" icon="statement">Extrato</x-nav-link>
             <x-nav-link :href="route('transactions.create')" :active="request()->routeIs('transactions.create')" icon="entry">Lançamento</x-nav-link>
-            <x-nav-link :href="route('admins.create')" :active="request()->routeIs('admins.create')" icon="admins">Admins</x-nav-link>
             <x-nav-link :href="route('reports.index')" :active="request()->routeIs('reports.index')" icon="reports">Relatórios</x-nav-link>
+            @if(Auth::user()->role === 'admin')
+                <x-nav-link :href="route('users.index')" :active="request()->routeIs('users.*')" icon="admins">Usuários</x-nav-link>
+            @endif
         </nav>
 
         <div class="sidebar-footer border-t border-line p-4">
             <div class="sidebar-footer-panel rounded-lg bg-slate-50 p-4">
-                <p class="eyebrow">Sessão interna</p>
-                <p class="mt-2 text-sm font-bold text-ink">Admin Financeiro</p>
-                <p class="text-xs font-medium text-muted">Dados demonstrativos</p>
+                <p class="eyebrow">Sessão</p>
+                <p class="mt-2 text-sm font-bold text-ink">{{ Auth::user()->name }}</p>
+                <p class="text-xs font-medium text-muted capitalize">{{ Auth::user()->role }}</p>
             </div>
-            <a href="{{ route('login') }}" title="Sair" class="sidebar-logout mt-3 flex items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold text-slate-500 transition hover:bg-slate-50 hover:text-danger">
-                <svg class="sidebar-icon h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
-                    <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
-                    <path d="M16 17l5-5-5-5" />
-                    <path d="M21 12H9" />
-                </svg>
-                <span class="sidebar-label truncate">Sair</span>
-            </a>
+            <form method="POST" action="{{ route('logout') }}" class="mt-3">
+                @csrf
+                <button type="submit" class="sidebar-logout flex w-full items-center gap-3 rounded-lg px-4 py-3 text-sm font-bold text-slate-500 transition hover:bg-slate-50 hover:text-danger">
+                    <svg class="sidebar-icon h-5 w-5 shrink-0" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true">
+                        <path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4" />
+                        <path d="M16 17l5-5-5-5" />
+                        <path d="M21 12H9" />
+                    </svg>
+                    <span class="sidebar-label truncate">Sair</span>
+                </button>
+            </form>
         </div>
     </aside>
 
