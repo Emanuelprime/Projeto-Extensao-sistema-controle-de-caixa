@@ -10,9 +10,7 @@ class ReportController extends Controller
 {
     public function index()
     {
-        $userCashRegisterIds = CashRegister::where('user_id', Auth::id())->pluck('id');
-
-        $allTransactions = Transaction::whereIn('cash_register_id', $userCashRegisterIds)->get();
+        $allTransactions = Transaction::all();
 
         // Totais gerais
         $totalEntradas = $allTransactions->where('type', 'entrada')->sum('amount');

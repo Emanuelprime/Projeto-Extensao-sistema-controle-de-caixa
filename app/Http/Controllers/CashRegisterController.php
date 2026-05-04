@@ -12,8 +12,7 @@ class CashRegisterController extends Controller
     // Método para exibir o Dashboard do Caixa
     public function dashboard()
     {
-        $activeRegister = CashRegister::where('user_id', Auth::id())
-                                      ->where('status', 'aberto')
+        $activeRegister = CashRegister::where('status', 'aberto')
                                       ->with('transactions')
                                       ->first();
                                       
@@ -66,8 +65,8 @@ class CashRegisterController extends Controller
 
     public function open(OpenCashRegisterRequest $request)
     {
-        if (CashRegister::where('user_id', Auth::id())->where('status', 'aberto')->exists()) {
-            return back()->withErrors(['error' => 'Você já possui um caixa aberto no momento. Feche-o antes de abrir outro.']);
+        if (CashRegister::where('status', 'aberto')->exists()) {
+            return back()->withErrors(['error' => 'Já existe um caixa aberto no sistema. É necessário fechá-lo antes de abrir um novo.']);
         }
 
         CashRegister::create([
@@ -82,8 +81,7 @@ class CashRegisterController extends Controller
 
     public function close(Request $request)
     {
-        $activeRegister = CashRegister::where('user_id', Auth::id())
-                                      ->where('status', 'aberto')
+        $activeRegister = CashRegister::where('status', 'aberto')
                                       ->first();
 
         if (!$activeRegister) {

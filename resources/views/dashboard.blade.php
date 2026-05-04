@@ -10,7 +10,7 @@
     @endphp
 
     <x-slot:actions>
-        @if(\App\Models\CashRegister::where('user_id', Auth::id())->where('status', 'aberto')->exists())
+        @if(\App\Models\CashRegister::where('status', 'aberto')->exists())
             <form action="{{ route('cash_register.close') }}" method="POST" class="inline-block mt-2 sm:mt-0">
                 @csrf
                 <button type="submit" class="secondary-button !border-red-300 !text-red-700 hover:!bg-red-50">Fechar Caixa Ativo</button>

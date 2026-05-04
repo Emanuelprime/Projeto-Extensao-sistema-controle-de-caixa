@@ -10,6 +10,8 @@
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <meta name="color-scheme" content="light">
     <title>{{ $title }} | Instituto JP II</title>
+    <link rel="icon" type="image/png" href="{{ asset('img/salesiano.png') }}?v=2">
+    <link rel="shortcut icon" href="{{ asset('img/salesiano.png') }}?v=2" type="image/x-icon">
     <script>
         (function () {
             try {

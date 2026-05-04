@@ -15,8 +15,7 @@ class TransactionController extends Controller
 
     public function store(\App\Http\Requests\StoreTransactionRequest $request)
     {
-        $activeRegister = CashRegister::where('user_id', Auth::id())
-                                      ->where('status', 'aberto')
+        $activeRegister = CashRegister::where('status', 'aberto')
                                       ->first();
 
         if (!$activeRegister) {
@@ -46,10 +45,7 @@ class TransactionController extends Controller
 
     public function index(Request $request)
     {
-        $userCashRegisterIds = CashRegister::where('user_id', Auth::id())->pluck('id');
-
-        $query = Transaction::whereIn('cash_register_id', $userCashRegisterIds)
-                            ->orderBy('created_at', 'desc');
+        $query = Transaction::orderBy('created_at', 'desc');
 
         if ($request->filled('date_start')) {
             $query->whereDate('created_at', '>=', $request->date_start);
@@ -88,10 +84,8 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction)
     {
-        $owns = CashRegister::where('user_id', Auth::id())
-                            ->where('id', $transaction->cash_register_id)
-                            ->exists();
-        if (!$owns) {
+        // Permite excluir qualquer transação se for admin ou se o caixa ainda existir
+        if (!Auth::user()->isAdmin() && !$transaction->cashRegister) {
             abort(403);
         }
 
@@ -159,8 +153,7 @@ class TransactionController extends Controller
 
     private function filteredQuery(Request $request)
     {
-        $ids   = CashRegister::where('user_id', Auth::id())->pluck('id');
-        $query = Transaction::whereIn('cash_register_id', $ids)->orderBy('created_at', 'desc');
+        $query = Transaction::orderBy('created_at', 'desc');
 
         if ($request->filled('date_start'))    $query->whereDate('created_at', '>=', $request->date_start);
         if ($request->filled('date_end'))      $query->whereDate('created_at', '<=', $request->date_end);

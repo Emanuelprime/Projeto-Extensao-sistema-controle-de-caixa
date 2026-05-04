@@ -109,8 +109,7 @@
             <section class="surface p-6">
                 <p class="eyebrow">Saldo do caixa aberto</p>
                 @php
-                    $activeRegister = \App\Models\CashRegister::where('user_id', auth()->id())
-                        ->where('status', 'aberto')
+                    $activeRegister = \App\Models\CashRegister::where('status', 'aberto')
                         ->with('transactions')
                         ->first();
                     if ($activeRegister) {
@@ -132,8 +131,7 @@
             <section class="quiet-surface p-6">
                 <p class="eyebrow">Lançamentos hoje</p>
                 @php
-                    $lancamentosHoje = \App\Models\Transaction::whereHas('cashRegister', fn($q) => $q->where('user_id', auth()->id()))
-                        ->whereDate('created_at', today())
+                    $lancamentosHoje = \App\Models\Transaction::whereDate('created_at', today())
                         ->count();
                 @endphp
                 <p class="mt-3 font-display text-4xl font-black text-ink">{{ str_pad($lancamentosHoje, 2, '0', STR_PAD_LEFT) }}</p>
