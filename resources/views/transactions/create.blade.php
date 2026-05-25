@@ -9,6 +9,7 @@
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)]">
         <form method="POST" action="{{ route('transactions.store') }}"
               enctype="multipart/form-data"
+              data-financial-entry-form
               class="surface p-6 sm:p-8">
             @csrf
 
@@ -69,35 +70,37 @@
                 </label>
 
                 <label class="block">
-                    <span class="field-label">Banco (Opcional)</span>
-                    <input name="bank_name" class="field-control" type="text"
+                    <span class="field-label">Nome do banco</span>
+                    <input name="bank_name" data-bank-input class="field-control" type="text"
                            placeholder="Ex: Banco do Brasil" value="{{ old('bank_name') }}">
                 </label>
 
                 <label class="block">
-                    <span class="field-label">Conta Bancária (Opcional)</span>
-                    <input name="bank_account" class="field-control" type="text"
-                           placeholder="Ex: Ag. 1234 c/c 56789-0" value="{{ old('bank_account') }}">
+                    <span class="field-label">Número da conta</span>
+                    <input name="bank_account" data-bank-account-input class="field-control" type="text"
+                           placeholder="Ex: 12345-6" value="{{ old('bank_account') }}">
                 </label>
 
                 <label class="block md:col-span-2">
                     <span class="field-label">Categoria do fluxo</span>
-                    <select name="payment_method" class="field-control" id="category-select">
+                    <select name="payment_method" data-category-select class="field-control">
                         <option value="">Selecione uma categoria</option>
                         @foreach ($categories as $category)
                             <option {{ old('payment_method') === $category ? 'selected' : '' }} value="{{ $category }}">{{ $category }}</option>
                         @endforeach
-                        <option value="__NEW__" {{ old('payment_method') === '__NEW__' ? 'selected' : '' }}>[Criar nova categoria...]</option>
+                        <option value="__new_category__">[Criar nova categoria...]</option>
                     </select>
                 </label>
 
-                <div class="block md:col-span-2" id="new-category-container" style="display: {{ old('payment_method') === '__NEW__' ? 'block' : 'none' }};">
+                <div data-new-category-panel class="hidden md:col-span-2 rounded-lg border border-line bg-slate-50 p-4">
                     <label class="block">
-                        <span class="field-label text-action">Nome da Nova Categoria</span>
-                        <input name="new_category" id="new_category" class="field-control border-action" type="text"
-                               placeholder="Digite o nome da nova categoria"
-                               value="{{ old('new_category') }}">
+                        <span class="field-label">Nova categoria</span>
+                        <input data-new-category-input class="field-control" type="text" placeholder="Ex: Eventos institucionais">
                     </label>
+                    <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                        <button type="button" data-cancel-category class="secondary-button py-2">Cancelar</button>
+                        <button type="button" data-save-category class="primary-button py-2">Salvar categoria</button>
+                    </div>
                 </div>
 
                 <label class="block md:col-span-2">
@@ -170,24 +173,4 @@
             </section>
         </aside>
     </div>
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const categorySelect = document.getElementById('category-select');
-            const newCategoryContainer = document.getElementById('new-category-container');
-            const newCategoryInput = document.getElementById('new_category');
-
-            if (categorySelect && newCategoryContainer) {
-                categorySelect.addEventListener('change', function() {
-                    if (this.value === '__NEW__') {
-                        newCategoryContainer.style.display = 'block';
-                        if (newCategoryInput) newCategoryInput.focus();
-                    } else {
-                        newCategoryContainer.style.display = 'none';
-                        if (newCategoryInput) newCategoryInput.value = '';
-                    }
-                });
-            }
-        });
-    </script>
 </x-admin-layout>

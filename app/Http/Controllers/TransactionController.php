@@ -28,10 +28,9 @@ class TransactionController extends Controller
         }
 
         $paymentMethod = $request->validated('payment_method');
-        if ($paymentMethod === '__NEW__') {
-            $newCategory = $request->validated('new_category');
-            \App\Models\Category::firstOrCreate(['name' => $newCategory]);
-            $paymentMethod = $newCategory;
+        $defaultCategories = ['Doações', 'Repasses', 'Oficinas', 'Manutenção', 'Pessoal', 'Alimentação', 'Transporte', 'Materiais', 'Despesas Administrativas'];
+        if ($paymentMethod && !in_array($paymentMethod, $defaultCategories)) {
+            \App\Models\Category::firstOrCreate(['name' => $paymentMethod]);
         }
 
         Transaction::create([
