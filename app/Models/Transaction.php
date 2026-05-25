@@ -16,6 +16,8 @@ class Transaction extends Model
         'amount',
         'description',
         'payment_method',
+        'bank_name',
+        'bank_account',
         'receipt_path',
         'competencia_date',
         'notes',

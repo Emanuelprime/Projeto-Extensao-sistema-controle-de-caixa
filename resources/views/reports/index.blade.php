@@ -6,181 +6,80 @@
         <a href="{{ route('reports.index') }}" class="secondary-button">Atualizar dados</a>
     </x-slot:actions>
 
-    @php
-        $selectedBanks = request('bank_names', []);
-        if (is_string($selectedBanks)) {
-            $selectedBanks = array_filter(explode(',', $selectedBanks));
-        }
-        if (! is_array($selectedBanks)) {
-            $selectedBanks = [];
-        }
-        if (request('bank_name')) {
-            $selectedBanks[] = request('bank_name');
-        }
-        $selectedBanks = array_values(array_unique(array_filter($selectedBanks)));
-
-        $selectedAccounts = request('bank_accounts', []);
-        if (is_string($selectedAccounts)) {
-            $selectedAccounts = array_filter(explode(',', $selectedAccounts));
-        }
-        if (! is_array($selectedAccounts)) {
-            $selectedAccounts = [];
-        }
-        if (request('bank_account')) {
-            $selectedAccounts[] = request('bank_account');
-        }
-        $selectedAccounts = array_values(array_unique(array_filter($selectedAccounts)));
-
-        $selectedCategories = request('payment_methods', []);
-        if (is_string($selectedCategories)) {
-            $selectedCategories = array_filter(explode(',', $selectedCategories));
-        }
-        if (! is_array($selectedCategories)) {
-            $selectedCategories = [];
-        }
-        if (request('payment_method')) {
-            $selectedCategories[] = request('payment_method');
-        }
-        $selectedCategories = array_values(array_unique(array_filter($selectedCategories)));
-        $reportFilters = [];
-        if ($selectedBanks) {
-            $reportFilters['bank_names'] = $selectedBanks;
-        }
-        if ($selectedAccounts) {
-            $reportFilters['bank_accounts'] = $selectedAccounts;
-        }
-        if ($selectedCategories) {
-            $reportFilters['payment_methods'] = $selectedCategories;
-        }
-        $defaultBanks = ['Banco do Brasil', 'Caixa Econômica Federal', 'Bradesco', 'Itaú', 'Santander', 'Nubank', 'Inter', 'Sicredi', 'Sicoob'];
-        $filterBanks = array_values(array_unique(array_merge($defaultBanks, $selectedBanks)));
-        $filterAccounts = $selectedAccounts;
-        $defaultCategories = ['Doações', 'Repasses', 'Oficinas', 'Manutenção', 'Pessoal', 'Alimentação', 'Transporte', 'Materiais', 'Despesas Administrativas'];
-        $filterCategories = array_values(array_unique(array_merge($defaultCategories, $selectedCategories)));
-    @endphp
-
-    <section class="quiet-surface p-5">
-        <div class="mb-5">
-            <p class="eyebrow">Filtros de emissão</p>
-            <h2 class="mt-1 text-xl font-extrabold text-ink">Relatório por banco, conta ou categoria</h2>
+    {{-- Filtros Avançados --}}
+    <section class="mb-6 quiet-surface p-6 sm:p-8">
+        <div class="flex items-center justify-between border-b border-line pb-4 mb-6">
+            <div>
+                <p class="eyebrow">Filtragem de Relatórios</p>
+                <h2 class="text-xl font-extrabold text-navy-900 mt-1">Filtros Avançados</h2>
+            </div>
+            @if(request()->anyFilled(['bank_names', 'bank_accounts', 'payment_methods']))
+                <a href="{{ route('reports.index') }}" class="text-xs font-bold text-danger hover:underline">× Limpar Filtros</a>
+            @endif
         </div>
-
-        <form method="GET" action="{{ route('reports.index') }}" class="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_auto] lg:items-end">
-            <div
-                class="relative block"
-                data-report-multiselect
-                data-report-storage-key="jp-finance-bank-names"
-                data-report-input-name="bank_names[]"
-                data-report-empty-label="Todos os bancos"
-                data-report-plural-label="bancos"
-            >
-                <span class="field-label">Banco</span>
-                <button type="button" data-report-trigger class="field-control flex items-center justify-between gap-3 border border-slate-300 text-left hover:border-action" aria-expanded="false">
-                    <span data-report-label>Todos os bancos</span>
-                    <span class="text-lg leading-none text-slate-500" aria-hidden="true">⌄</span>
-                </button>
-
-                <div data-report-menu class="absolute left-0 right-0 z-20 mt-2 hidden overflow-hidden rounded-lg border border-line bg-white shadow-soft">
-                    <label class="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm font-semibold text-ink transition hover:bg-slate-50">
-                        <input type="checkbox" data-report-all class="h-4 w-4 rounded border-line text-action focus:ring-action" @checked(count($selectedBanks) === 0)>
-                        <span>Todos os bancos</span>
+        <form method="GET" action="{{ route('reports.index') }}">
+            <div class="grid gap-6 md:grid-cols-3">
+                {{-- Banco --}}
+                <div>
+                    <label class="block">
+                        <span class="field-label">Bancos Utilizados</span>
+                        <div class="mt-2 space-y-2 max-h-40 overflow-y-auto border border-line rounded-lg p-3 bg-slate-50">
+                            @forelse ($realBankNames as $bank)
+                                <label class="flex items-center gap-2 text-sm font-medium text-ink cursor-pointer hover:text-action">
+                                    <input type="checkbox" name="bank_names[]" value="{{ $bank }}"
+                                           @checked(is_array(request('bank_names')) && in_array($bank, request('bank_names')))>
+                                    <span>{{ $bank }}</span>
+                                </label>
+                            @empty
+                                <span class="text-xs text-muted">Nenhum banco registrado</span>
+                            @endforelse
+                        </div>
                     </label>
-                    <div data-report-options class="max-h-64 overflow-auto border-t border-line py-1">
-                        @foreach ($filterBanks as $bank)
-                            <label class="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-blue-50">
-                                <input type="checkbox" value="{{ $bank }}" data-report-option class="h-4 w-4 rounded border-line text-action focus:ring-action" @checked(in_array($bank, $selectedBanks, true))>
-                                <span>{{ $bank }}</span>
-                            </label>
-                        @endforeach
-                    </div>
                 </div>
 
-                <div data-report-inputs></div>
-            </div>
-
-            <div
-                class="relative block"
-                data-report-multiselect
-                data-report-storage-key="jp-finance-bank-accounts"
-                data-report-input-name="bank_accounts[]"
-                data-report-empty-label="Todas as contas"
-                data-report-plural-label="contas"
-            >
-                <span class="field-label">Conta bancária</span>
-                <button type="button" data-report-trigger class="field-control flex items-center justify-between gap-3 border border-slate-300 text-left hover:border-action" aria-expanded="false">
-                    <span data-report-label>Todas as contas</span>
-                    <span class="text-lg leading-none text-slate-500" aria-hidden="true">⌄</span>
-                </button>
-
-                <div data-report-menu class="absolute left-0 right-0 z-20 mt-2 hidden overflow-hidden rounded-lg border border-line bg-white shadow-soft">
-                    <label class="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm font-semibold text-ink transition hover:bg-slate-50">
-                        <input type="checkbox" data-report-all class="h-4 w-4 rounded border-line text-action focus:ring-action" @checked(count($selectedAccounts) === 0)>
-                        <span>Todas as contas</span>
+                {{-- Conta --}}
+                <div>
+                    <label class="block">
+                        <span class="field-label">Contas Utilizadas</span>
+                        <div class="mt-2 space-y-2 max-h-40 overflow-y-auto border border-line rounded-lg p-3 bg-slate-50">
+                            @forelse ($realBankAccounts as $account)
+                                <label class="flex items-center gap-2 text-sm font-medium text-ink cursor-pointer hover:text-action">
+                                    <input type="checkbox" name="bank_accounts[]" value="{{ $account }}"
+                                           @checked(is_array(request('bank_accounts')) && in_array($account, request('bank_accounts')))>
+                                    <span>{{ $account }}</span>
+                                </label>
+                            @empty
+                                <span class="text-xs text-muted">Nenhuma conta registrada</span>
+                            @endforelse
+                        </div>
                     </label>
-                    <div data-report-options class="max-h-64 overflow-auto border-t border-line py-1">
-                        @foreach ($filterAccounts as $account)
-                            <label class="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-blue-50">
-                                <input type="checkbox" value="{{ $account }}" data-report-option class="h-4 w-4 rounded border-line text-action focus:ring-action" @checked(in_array($account, $selectedAccounts, true))>
-                                <span>{{ $account }}</span>
-                            </label>
-                        @endforeach
-                    </div>
                 </div>
 
-                <div data-report-inputs></div>
-            </div>
-
-            <div
-                class="relative block"
-                data-report-multiselect
-                data-report-storage-key="jp-finance-custom-categories"
-                data-report-input-name="payment_methods[]"
-                data-report-empty-label="Todas as categorias"
-                data-report-plural-label="categorias"
-            >
-                <span class="field-label">Categoria de fluxo</span>
-                <button
-                    type="button"
-                    data-report-trigger
-                    class="field-control flex items-center justify-between gap-3 border border-slate-300 text-left hover:border-action"
-                    aria-expanded="false"
-                >
-                    <span data-report-label>Todas as categorias</span>
-                    <span class="text-lg leading-none text-slate-500" aria-hidden="true">⌄</span>
-                </button>
-
-                <div
-                    data-report-menu
-                    class="absolute left-0 right-0 z-20 mt-2 hidden overflow-hidden rounded-lg border border-line bg-white shadow-soft"
-                >
-                    <label class="flex cursor-pointer items-center gap-3 px-4 py-3 text-sm font-semibold text-ink transition hover:bg-slate-50">
-                        <input type="checkbox" data-report-all class="h-4 w-4 rounded border-line text-action focus:ring-action" @checked(count($selectedCategories) === 0)>
-                        <span>Todas as categorias</span>
+                {{-- Categoria --}}
+                <div>
+                    <label class="block">
+                        <span class="field-label">Categorias</span>
+                        <div class="mt-2 space-y-2 max-h-40 overflow-y-auto border border-line rounded-lg p-3 bg-slate-50">
+                            @forelse ($realCategories as $category)
+                                <label class="flex items-center gap-2 text-sm font-medium text-ink cursor-pointer hover:text-action">
+                                    <input type="checkbox" name="payment_methods[]" value="{{ $category }}"
+                                           @checked(is_array(request('payment_methods')) && in_array($category, request('payment_methods')))>
+                                    <span>{{ $category }}</span>
+                                </label>
+                            @empty
+                                <span class="text-xs text-muted">Nenhuma categoria registrada</span>
+                            @endforelse
+                        </div>
                     </label>
-                    <div data-report-options class="max-h-64 overflow-auto border-t border-line py-1">
-                        @foreach ($filterCategories as $category)
-                            <label class="flex cursor-pointer items-center gap-3 px-4 py-2.5 text-sm font-medium text-ink transition hover:bg-blue-50">
-                                <input
-                                    type="checkbox"
-                                    value="{{ $category }}"
-                                    data-report-option
-                                    class="h-4 w-4 rounded border-line text-action focus:ring-action"
-                                    @checked(in_array($category, $selectedCategories, true))
-                                >
-                                <span>{{ $category }}</span>
-                            </label>
-                        @endforeach
-                    </div>
                 </div>
-
-                <div data-report-inputs></div>
             </div>
-
-            <button type="submit" class="primary-button">Emitir relatório</button>
+            <div class="mt-6 flex justify-end gap-3">
+                <button type="submit" class="primary-button px-6">Filtrar Relatório</button>
+            </div>
         </form>
     </section>
 
-    <div class="mt-6 grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.85fr)]">
+    <div class="grid gap-6 xl:grid-cols-[minmax(0,1.35fr)_minmax(320px,0.85fr)]">
 
         {{-- Distribuição por categoria --}}
         <section class="surface p-6 sm:p-8">
@@ -224,16 +123,23 @@
             </p>
 
             <div class="mt-8 space-y-3">
-                <a href="{{ route('transactions.export_pdf', $reportFilters) }}"
+                <a href="{{ route('transactions.export_pdf', request()->query()) }}"
                    class="primary-button w-full text-center block">
                     ↓ Relatório completo (PDF)
                 </a>
-                <a href="{{ route('transactions.export_csv', $reportFilters) }}"
+                <a href="{{ route('transactions.export_csv', request()->query()) }}"
                    class="secondary-button w-full text-center block">
                     ↓ Dados brutos (CSV)
                 </a>
             </div>
 
+            <div class="mt-6 rounded-lg bg-slate-50 p-4 text-sm text-muted">
+                <p class="font-extrabold text-ink">Dica</p>
+                <p class="mt-1">Para exportar um período específico, aplique os filtros no
+                    <a href="{{ route('transactions.index') }}" class="font-bold text-action underline">Extrato</a>
+                    e use os botões de exportação de lá.
+                </p>
+            </div>
         </aside>
     </div>
 

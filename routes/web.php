@@ -28,7 +28,10 @@ Route::middleware('auth')->group(function () {
 
     // Transações
     Route::get('/lancamentos/novo', function () {
-        $categories = ['Doações', 'Repasses', 'Oficinas', 'Manutenção', 'Pessoal', 'Alimentação', 'Transporte', 'Materiais'];
+        $defaultCategories = ['Doações', 'Repasses', 'Oficinas', 'Manutenção', 'Pessoal', 'Alimentação', 'Transporte', 'Materiais', 'Despesas Administrativas'];
+        $customCategories = \App\Models\Category::pluck('name')->toArray();
+        $categories = array_unique(array_merge($defaultCategories, $customCategories));
+        sort($categories);
         return view('transactions.create', compact('categories'));
     })->name('transactions.create');
 

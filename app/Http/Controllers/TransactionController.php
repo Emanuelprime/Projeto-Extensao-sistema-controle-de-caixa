@@ -27,12 +27,21 @@ class TransactionController extends Controller
             $receiptPath = $request->file('receipt')->store('receipts', 'public');
         }
 
+        $paymentMethod = $request->validated('payment_method');
+        if ($paymentMethod === '__NEW__') {
+            $newCategory = $request->validated('new_category');
+            \App\Models\Category::firstOrCreate(['name' => $newCategory]);
+            $paymentMethod = $newCategory;
+        }
+
         Transaction::create([
             'cash_register_id'  => $activeRegister->id,
             'type'              => $request->validated('type'),
             'amount'            => $request->validated('amount'),
             'description'       => $request->validated('description'),
-            'payment_method'    => $request->validated('payment_method'),
+            'payment_method'    => $paymentMethod,
+            'bank_name'         => $request->validated('bank_name'),
+            'bank_account'      => $request->validated('bank_account'),
             'receipt_path'      => $receiptPath,
             'competencia_date'  => $request->validated('competencia_date'),
             'notes'             => $request->validated('notes'),
@@ -75,7 +84,10 @@ class TransactionController extends Controller
         ];
 
         $paginated  = $query->paginate(15)->withQueryString();
-        $categories = ['Doações', 'Repasses', 'Oficinas', 'Manutenção', 'Pessoal', 'Alimentação', 'Transporte', 'Materiais'];
+        $defaultCategories = ['Doações', 'Repasses', 'Oficinas', 'Manutenção', 'Pessoal', 'Alimentação', 'Transporte', 'Materiais', 'Despesas Administrativas'];
+        $customCategories = \App\Models\Category::pluck('name')->toArray();
+        $categories = array_unique(array_merge($defaultCategories, $customCategories));
+        sort($categories);
 
         return view('transactions.index', compact('summary', 'paginated', 'categories'));
     }
@@ -113,7 +125,7 @@ class TransactionController extends Controller
         $callback = function () use ($transactions) {
             $handle = fopen('php://output', 'w');
             fprintf($handle, chr(0xEF) . chr(0xBB) . chr(0xBF));
-            fputcsv($handle, ['Data Registro', 'Competência', 'Descrição', 'Tipo', 'Categoria', 'Valor (R$)', 'Observações'], ';');
+            fputcsv($handle, ['Data Registro', 'Competência', 'Descrição', 'Tipo', 'Categoria', 'Banco', 'Conta Bancária', 'Valor (R$)', 'Observações'], ';');
 
             foreach ($transactions as $t) {
                 fputcsv($handle, [
@@ -122,6 +134,8 @@ class TransactionController extends Controller
                     $t->description,
                     ucfirst($t->type),
                     $t->payment_method ?? '-',
+                    $t->bank_name ?? '-',
+                    $t->bank_account ?? '-',
                     number_format($t->amount, 2, ',', '.'),
                     $t->notes ?? '-',
                 ], ';');
@@ -159,8 +173,23 @@ class TransactionController extends Controller
         if ($request->filled('date_end'))      $query->whereDate('created_at', '<=', $request->date_end);
         if ($request->filled('type') && in_array($request->type, ['entrada', 'saida']))
                                                $query->where('type', $request->type);
-        if ($request->filled('payment_method')) $query->where('payment_method', $request->payment_method);
         if ($request->filled('search'))        $query->where('description', 'like', '%' . $request->search . '%');
+
+        // Filtros múltiplos de bancos, contas e categorias
+        if ($request->filled('bank_names')) {
+            $query->whereIn('bank_name', $request->input('bank_names'));
+        }
+        if ($request->filled('bank_accounts')) {
+            $query->whereIn('bank_account', $request->input('bank_accounts'));
+        }
+        if ($request->filled('payment_methods')) {
+            $query->whereIn('payment_method', $request->input('payment_methods'));
+        }
+
+        // Filtro de categoria única (caso venha do extrato simples)
+        if ($request->filled('payment_method')) {
+            $query->where('payment_method', $request->payment_method);
+        }
 
         return $query;
     }

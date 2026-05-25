@@ -125,6 +125,8 @@
                     <th>Data</th>
                     <th>Descrição</th>
                     <th>Categoria</th>
+                    <th>Banco</th>
+                    <th>Conta</th>
                     <th>Tipo</th>
                     <th class="text-right">Valor (R$)</th>
                 </tr>
@@ -135,6 +137,8 @@
                         <td>{{ $t->created_at->format('d/m/Y H:i') }}</td>
                         <td class="font-bold">{{ $t->description }}</td>
                         <td>{{ $t->payment_method ?? '—' }}</td>
+                        <td>{{ $t->bank_name ?? '—' }}</td>
+                        <td>{{ $t->bank_account ?? '—' }}</td>
                         <td>
                             @if($t->type === 'entrada')
                                 <span class="badge-entrada">↑ Receita</span>
@@ -148,7 +152,7 @@
                     </tr>
                 @empty
                     <tr>
-                        <td colspan="5" style="text-align:center; padding: 20px; color: #94a3b8;">
+                        <td colspan="7" style="text-align:center; padding: 20px; color: #94a3b8;">
                             Nenhum lançamento encontrado.
                         </td>
                     </tr>
