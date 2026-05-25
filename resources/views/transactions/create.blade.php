@@ -9,6 +9,7 @@
     <div class="grid gap-6 xl:grid-cols-[minmax(0,1.55fr)_minmax(300px,0.85fr)]">
         <form method="POST" action="{{ route('transactions.store') }}"
               enctype="multipart/form-data"
+              data-financial-entry-form
               class="surface p-6 sm:p-8">
             @csrf
 
@@ -68,15 +69,42 @@
                     <span class="mt-1 text-xs text-muted">Se diferente da data de hoje</span>
                 </label>
 
+                <label class="block">
+                    <span class="field-label">Nome do banco</span>
+                    <input name="bank_name" data-bank-input class="field-control" type="text"
+                           placeholder="Ex: Banco do Brasil" value="{{ old('bank_name') }}">
+                </label>
+
+                <label class="block">
+                    <span class="field-label">Número da conta</span>
+                    <input name="bank_account" data-bank-account-input class="field-control" type="text"
+                           placeholder="Ex: 12345-6" value="{{ old('bank_account') }}">
+                </label>
+
                 <label class="block md:col-span-2">
                     <span class="field-label">Categoria do fluxo</span>
-                    <select name="payment_method" class="field-control">
+                    <select name="payment_method" data-category-select class="field-control">
                         <option value="">Selecione uma categoria</option>
                         @foreach ($categories as $category)
                             <option {{ old('payment_method') === $category ? 'selected' : '' }}>{{ $category }}</option>
                         @endforeach
+                        @unless(in_array('Despesas Administrativas', $categories))
+                            <option {{ old('payment_method') === 'Despesas Administrativas' ? 'selected' : '' }}>Despesas Administrativas</option>
+                        @endunless
+                        <option value="__new_category__">Criar nova categoria...</option>
                     </select>
                 </label>
+
+                <div data-new-category-panel class="hidden md:col-span-2 rounded-lg border border-line bg-slate-50 p-4">
+                    <label class="block">
+                        <span class="field-label">Nova categoria</span>
+                        <input data-new-category-input class="field-control" type="text" placeholder="Ex: Eventos institucionais">
+                    </label>
+                    <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                        <button type="button" data-cancel-category class="secondary-button py-2">Cancelar</button>
+                        <button type="button" data-save-category class="primary-button py-2">Salvar categoria</button>
+                    </div>
+                </div>
 
                 <label class="block md:col-span-2">
                     <span class="field-label">Observações complementares</span>
