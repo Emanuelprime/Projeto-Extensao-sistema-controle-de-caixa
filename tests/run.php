@@ -95,6 +95,13 @@ function refreshDatabase(): void
     Schema::dropIfExists('transactions');
     Schema::dropIfExists('cash_registers');
     Schema::dropIfExists('users');
+    Schema::dropIfExists('categories');
+
+    Schema::create('categories', function (Blueprint $table): void {
+        $table->id();
+        $table->string('name')->unique();
+        $table->timestamps();
+    });
 
     Schema::create('users', function (Blueprint $table): void {
         $table->id();
@@ -126,6 +133,8 @@ function refreshDatabase(): void
         $table->decimal('amount', 10, 2);
         $table->string('description');
         $table->string('payment_method', 50)->nullable();
+        $table->string('bank_name', 255)->nullable();
+        $table->string('bank_account', 100)->nullable();
         $table->string('receipt_path', 500)->nullable();
         $table->date('competencia_date')->nullable();
         $table->text('notes')->nullable();
