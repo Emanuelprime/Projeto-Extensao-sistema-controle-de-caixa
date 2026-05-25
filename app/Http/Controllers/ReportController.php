@@ -69,15 +69,30 @@ class ReportController extends Controller
         // Histórico de exportações
         $exports = [];
 
+        // Definir as variáveis exatas exigidas pela view do frontend
+        $selectedBanks = (array) $request->input('bank_names', []);
+        $selectedAccounts = (array) $request->input('bank_accounts', []);
+        $selectedCategories = (array) $request->input('payment_methods', []);
+
+        $filterBanks = $realBankNames;
+        $filterAccounts = $realBankAccounts;
+        $filterCategories = $realCategories;
+
+        $reportFilters = $request->only(['bank_names', 'bank_accounts', 'payment_methods']);
+
         return view('reports.index', compact(
             'distributionFormatted',
             'totalEntradas',
             'totalSaidas',
             'saldo',
             'exports',
-            'realBankNames',
-            'realBankAccounts',
-            'realCategories'
+            'selectedBanks',
+            'selectedAccounts',
+            'selectedCategories',
+            'filterBanks',
+            'filterAccounts',
+            'filterCategories',
+            'reportFilters'
         ));
     }
 }

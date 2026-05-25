@@ -19,7 +19,7 @@
         @else
             <form action="{{ route('cash_register.open') }}" method="POST" class="inline-block mt-2 sm:mt-0">
                 @csrf
-                <input type="hidden" name="opening_balance" value="150.00">
+                <input type="hidden" name="opening_balance" value="0.00">
                 <button type="submit" class="secondary-button !border-green-300 !text-green-700 hover:!bg-green-50">Abrir caixa</button>
             </form>
             <button onclick="alert('Abra um caixa primeiro!')" class="primary-button opacity-50 cursor-not-allowed">Novo lançamento</button>
