@@ -71,8 +71,16 @@
 
                 <label class="block">
                     <span class="field-label">Nome do banco</span>
-                    <input name="bank_name" data-bank-input class="field-control" type="text"
-                           placeholder="Ex: Banco do Brasil" value="{{ old('bank_name') }}">
+                    <select name="bank_name" data-bank-select class="field-control">
+                        <option value="">Selecione um banco</option>
+                        @foreach ($banks as $bank)
+                            <option {{ old('bank_name') === $bank ? 'selected' : '' }} value="{{ $bank }}">{{ $bank }}</option>
+                        @endforeach
+                        @if(old('bank_name') && !in_array(old('bank_name'), $banks, true))
+                            <option selected value="{{ old('bank_name') }}">{{ old('bank_name') }}</option>
+                        @endif
+                        <option value="__new_bank__">[Criar novo banco...]</option>
+                    </select>
                 </label>
 
                 <label class="block">
@@ -80,6 +88,17 @@
                     <input name="bank_account" data-bank-account-input class="field-control" type="text"
                            placeholder="Ex: 12345-6" value="{{ old('bank_account') }}">
                 </label>
+
+                <div data-new-bank-panel class="hidden md:col-span-2 rounded-lg border border-line bg-slate-50 p-4">
+                    <label class="block">
+                        <span class="field-label">Novo banco</span>
+                        <input data-new-bank-input class="field-control" type="text" placeholder="Ex: Banco Safra">
+                    </label>
+                    <div class="mt-4 flex flex-col-reverse gap-2 sm:flex-row sm:justify-end">
+                        <button type="button" data-cancel-bank class="secondary-button py-2">Cancelar</button>
+                        <button type="button" data-save-bank class="primary-button py-2">Salvar banco</button>
+                    </div>
+                </div>
 
                 <label class="block md:col-span-2">
                     <span class="field-label">Categoria do fluxo</span>

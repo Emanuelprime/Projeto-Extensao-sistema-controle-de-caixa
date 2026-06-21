@@ -6,6 +6,7 @@ use App\Http\Controllers\CashRegisterController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\ReportController;
 use App\Http\Controllers\UserController;
+use App\Support\FinanceOptions;
 
 Route::redirect('/', '/login');
 
@@ -32,7 +33,10 @@ Route::middleware('auth')->group(function () {
         $customCategories = \App\Models\Category::pluck('name')->toArray();
         $categories = array_unique(array_merge($defaultCategories, $customCategories));
         sort($categories);
-        return view('transactions.create', compact('categories'));
+        $categories = FinanceOptions::categories();
+        $banks = FinanceOptions::banks(includeTransactions: true);
+
+        return view('transactions.create', compact('categories', 'banks'));
     })->name('transactions.create');
 
     Route::post('/lancamentos',              [TransactionController::class, 'store'])->name('transactions.store');
@@ -46,11 +50,13 @@ Route::middleware('auth')->group(function () {
     })->name('admins.create');
 
     // Exportações
-    Route::get('/extrato/exportar-csv', [TransactionController::class, 'exportCsv'])->name('transactions.export_csv');
+    Route::get('/extrato/exportar-csv', [TransactionController::class, 'exportXlsx'])->name('transactions.export_csv');
+    Route::get('/extrato/exportar-xlsx', [TransactionController::class, 'exportXlsx'])->name('transactions.export_xlsx');
     Route::get('/extrato/exportar-pdf', [TransactionController::class, 'exportPdf'])->name('transactions.export_pdf');
 
     // Relatórios
     Route::get('/relatorios', [ReportController::class, 'index'])->name('reports.index');
+    Route::get('/relatorios/exportacoes/{exportHistory}/baixar', [TransactionController::class, 'downloadExport'])->name('reports.exports.download');
 
     // ─── Gestão de Usuários (somente admin — verificado no controller) ────────
     Route::get('/usuarios',              [UserController::class, 'index'])->name('users.index');

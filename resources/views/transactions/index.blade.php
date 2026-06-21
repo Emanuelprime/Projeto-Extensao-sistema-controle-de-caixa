@@ -5,8 +5,6 @@
 >
     <x-slot:actions>
         <a href="{{ route('transactions.create') }}" class="primary-button">Novo lançamento</a>
-        <a href="{{ route('transactions.export_csv', request()->query()) }}" class="secondary-button">Exportar CSV</a>
-        <a href="{{ route('transactions.export_pdf', request()->query()) }}" class="secondary-button">Exportar PDF</a>
     </x-slot:actions>
 
     <div class="grid gap-4 lg:grid-cols-3">

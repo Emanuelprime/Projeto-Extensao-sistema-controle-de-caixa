@@ -97,6 +97,7 @@ const categoryStorageKey = 'jp-finance-custom-categories';
 const bankStorageKey = 'jp-finance-bank-names';
 const accountStorageKey = 'jp-finance-bank-accounts';
 const newCategoryValue = '__new_category__';
+const newBankValue = '__new_bank__';
 
 function readStoredList(key) {
     try {
@@ -306,17 +307,75 @@ document.querySelectorAll('[data-category-select]').forEach((select) => {
     });
 });
 
+document.querySelectorAll('[data-bank-select]').forEach((select) => {
+    const form = select.closest('form');
+    const panel = form?.querySelector('[data-new-bank-panel]');
+    const input = form?.querySelector('[data-new-bank-input]');
+    const saveButton = form?.querySelector('[data-save-bank]');
+    const cancelButton = form?.querySelector('[data-cancel-bank]');
+
+    appendStoredOptions(select, bankStorageKey, newBankValue);
+
+    function closePanel() {
+        panel?.classList.add('hidden');
+        if (input) {
+            input.value = '';
+        }
+    }
+
+    function saveBank() {
+        const bank = input?.value.trim();
+
+        if (!bank) {
+            input?.focus();
+            return false;
+        }
+
+        addStoredValue(bankStorageKey, bank);
+        appendStoredOptions(select, bankStorageKey, newBankValue);
+        select.value = bank;
+        closePanel();
+        document.querySelectorAll(`[data-report-multiselect][data-report-storage-key="${bankStorageKey}"]`).forEach((container) => {
+            appendStoredReportOptions(container);
+            updateReportMultiselect(container);
+        });
+        return true;
+    }
+
+    select.addEventListener('change', () => {
+        panel?.classList.toggle('hidden', select.value !== newBankValue);
+
+        if (select.value === newBankValue) {
+            input?.focus();
+        }
+    });
+
+    saveButton?.addEventListener('click', saveBank);
+    cancelButton?.addEventListener('click', () => {
+        select.value = '';
+        closePanel();
+    });
+
+    form?.addEventListener('submit', (event) => {
+        if (select.value === newBankValue && !saveBank()) {
+            event.preventDefault();
+        }
+    });
+});
+
 document.querySelectorAll('[data-financial-entry-form]').forEach((form) => {
     form.addEventListener('submit', () => {
         const category = form.querySelector('[data-category-select]')?.value;
-        const bank = form.querySelector('[data-bank-input]')?.value;
+        const bank = form.querySelector('[data-bank-select]')?.value;
         const account = form.querySelector('[data-bank-account-input]')?.value;
 
         if (category && category !== newCategoryValue) {
             addStoredValue(categoryStorageKey, category);
         }
 
-        addStoredValue(bankStorageKey, bank);
+        if (bank && bank !== newBankValue) {
+            addStoredValue(bankStorageKey, bank);
+        }
         addStoredValue(accountStorageKey, account);
     });
 });

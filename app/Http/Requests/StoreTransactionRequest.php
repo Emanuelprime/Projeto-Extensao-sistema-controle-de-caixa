@@ -18,7 +18,7 @@ class StoreTransactionRequest extends FormRequest
             'amount'           => ['required', 'numeric', 'min:0.01'],
             'description'      => ['required', 'string', 'max:255'],
             'payment_method'   => ['nullable', 'string', 'max:50'],
-            'bank_name'        => ['nullable', 'string', 'max:255'],
+            'bank_name'        => ['nullable', 'string', 'max:100'],
             'bank_account'     => ['nullable', 'string', 'max:100'],
             'receipt'          => ['nullable', 'file', 'mimes:jpg,jpeg,png,pdf', 'max:10240'],
             'competencia_date' => ['nullable', 'date'],

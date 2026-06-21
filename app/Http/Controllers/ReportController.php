@@ -3,7 +3,9 @@
 namespace App\Http\Controllers;
 
 use App\Models\CashRegister;
+use App\Models\ExportHistory;
 use App\Models\Transaction;
+use App\Support\FinanceOptions;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
 
@@ -12,11 +14,7 @@ class ReportController extends Controller
     public function index(Request $request)
     {
         // 1. Popular os selects com dados reais do banco
-        $realBankNames = Transaction::whereNotNull('bank_name')
-            ->where('bank_name', '!=', '')
-            ->distinct()
-            ->pluck('bank_name')
-            ->toArray();
+        $realBankNames = FinanceOptions::banks(includeTransactions: true);
 
         $realBankAccounts = Transaction::whereNotNull('bank_account')
             ->where('bank_account', '!=', '')
@@ -29,6 +27,7 @@ class ReportController extends Controller
         $customCategories = \App\Models\Category::pluck('name')->toArray();
         $realCategories = array_unique(array_merge($defaultCategories, $customCategories));
         sort($realCategories);
+        $realCategories = FinanceOptions::categories();
 
         // 2. Aplicar filtros múltiplos nas transações de forma combinada
         $query = Transaction::orderBy('created_at', 'desc');
@@ -41,6 +40,12 @@ class ReportController extends Controller
         }
         if ($request->filled('payment_methods')) {
             $query->whereIn('payment_method', $request->input('payment_methods'));
+        }
+        if ($request->filled('date_start')) {
+            $query->whereDate('created_at', '>=', $request->date_start);
+        }
+        if ($request->filled('date_end')) {
+            $query->whereDate('created_at', '<=', $request->date_end);
         }
 
         $filteredTransactions = $query->get();
@@ -67,7 +72,19 @@ class ReportController extends Controller
         })->values()->toArray();
 
         // Histórico de exportações
-        $exports = [];
+        $exports = ExportHistory::latest()
+            ->limit(10)
+            ->get()
+            ->map(fn (ExportHistory $export) => [
+                'id' => $export->id,
+                'document' => $export->document,
+                'description' => $export->description ?? 'Arquivo gerado para auditoria',
+                'date' => $export->created_at->format('d/m/Y H:i'),
+                'format' => $export->format,
+                'size' => $this->formatFileSize($export->size_bytes),
+                'status' => $export->status,
+            ])
+            ->toArray();
 
         return view('reports.index', compact(
             'distributionFormatted',
@@ -79,5 +96,14 @@ class ReportController extends Controller
             'realBankAccounts',
             'realCategories'
         ));
+    }
+
+    private function formatFileSize(int $bytes): string
+    {
+        if ($bytes >= 1048576) {
+            return number_format($bytes / 1048576, 1, ',', '.') . ' MB';
+        }
+
+        return number_format(max($bytes, 1) / 1024, 1, ',', '.') . ' KB';
     }
 }

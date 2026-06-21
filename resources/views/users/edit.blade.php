@@ -42,9 +42,10 @@
                 </label>
 
                 <label class="block">
-                    <span class="field-label">Nova senha <span class="text-muted font-normal">(deixe em branco para manter)</span></span>
+                    <span class="field-label">Nova senha</span>
                     <input name="password" class="field-control" type="password"
                            placeholder="Mínimo 8 caracteres">
+                    <span class="mt-1 block text-xs font-medium text-muted">Deixe em branco para manter a senha atual.</span>
                 </label>
 
                 <label class="block">

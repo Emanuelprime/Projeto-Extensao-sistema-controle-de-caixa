@@ -24,8 +24,6 @@
             </form>
             <button onclick="alert('Abra um caixa primeiro!')" class="primary-button opacity-50 cursor-not-allowed">Novo lançamento</button>
         @endif
-        
-        <a href="{{ route('transactions.index') }}" class="secondary-button">Ver extrato</a>
     </x-slot:actions>
 
     <div class="grid gap-4 lg:grid-cols-3">

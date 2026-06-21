@@ -2,10 +2,6 @@
     title="Relatórios"
     subtitle="Centralize exportações para auditoria, prestação de contas e conferência mensal."
 >
-    <x-slot:actions>
-        <a href="{{ route('reports.index') }}" class="secondary-button">Atualizar dados</a>
-    </x-slot:actions>
-
 @php
         $selectedBanks = request('bank_names', []);
         if (is_string($selectedBanks)) {
@@ -44,6 +40,12 @@
         if ($selectedCategories) {
             $reportFilters['payment_methods'] = $selectedCategories;
         }
+        if (request()->filled('date_start')) {
+            $reportFilters['date_start'] = request('date_start');
+        }
+        if (request()->filled('date_end')) {
+            $reportFilters['date_end'] = request('date_end');
+        }
 
         $filterBanks = array_values(array_unique(array_merge($realBankNames, $selectedBanks)));
         $filterAccounts = array_values(array_unique(array_merge($realBankAccounts, $selectedAccounts)));
@@ -57,11 +59,21 @@
                 <p class="eyebrow">Filtros de emissão</p>
                 <h2 class="text-xl font-extrabold text-ink mt-1">Relatório por banco, conta ou categoria</h2>
             </div>
-            @if(request()->anyFilled(['bank_names', 'bank_accounts', 'payment_methods']))
+            @if(request()->anyFilled(['bank_names', 'bank_accounts', 'payment_methods', 'date_start', 'date_end']))
                 <a href="{{ route('reports.index') }}" class="text-xs font-bold text-danger hover:underline">× Limpar Filtros</a>
             @endif
         </div>
-        <form method="GET" action="{{ route('reports.index') }}" class="grid gap-4 lg:grid-cols-[1fr_1fr_1fr_auto] lg:items-end">
+        <form method="GET" action="{{ route('reports.index') }}" class="grid gap-4 md:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1fr_1fr_auto] xl:items-end">
+            <label class="block">
+                <span class="field-label">Data inicial</span>
+                <input class="field-control" type="date" name="date_start" value="{{ request('date_start') }}">
+            </label>
+
+            <label class="block">
+                <span class="field-label">Data final</span>
+                <input class="field-control" type="date" name="date_end" value="{{ request('date_end') }}">
+            </label>
+
             {{-- Banco --}}
             <div
                 class="relative block"
@@ -175,7 +187,7 @@
                 <div data-report-inputs></div>
             </div>
 
-            <button type="submit" class="primary-button">Emitir relatório</button>
+            <button type="submit" class="primary-button">Filtrar</button>
         </form>
     </section>
 
@@ -219,17 +231,17 @@
             <p class="eyebrow">Exportação financeira</p>
             <h2 class="mt-3 text-2xl font-extrabold leading-tight text-ink">Arquivos consolidados para auditoria</h2>
             <p class="mt-3 text-sm font-medium leading-6 text-muted">
-                Gere relatórios em PDF ou CSV com todos os lançamentos do seu histórico.
+                Gere relatórios em PDF ou XLSX com todos os lançamentos do seu histórico.
             </p>
 
             <div class="mt-8 space-y-3">
                 <a href="{{ route('transactions.export_pdf', $reportFilters) }}"
                    class="primary-button w-full text-center block">
-                    ↓ Relatório completo (PDF)
+                    ↓ Emitir relatório (PDF)
                 </a>
-                <a href="{{ route('transactions.export_csv', $reportFilters) }}"
+                <a href="{{ route('transactions.export_xlsx', $reportFilters) }}"
                    class="secondary-button w-full text-center block">
-                    ↓ Dados brutos (CSV)
+                    ↓ Emitir relatório (XLSX)
                 </a>
             </div>
 
@@ -280,7 +292,7 @@
                                 @if ($export['status'] === 'Falha')
                                     <button class="ghost-button text-danger">Revisar</button>
                                 @else
-                                    <button class="ghost-button">Baixar</button>
+                                    <a href="{{ route('reports.exports.download', $export['id']) }}" class="ghost-button">Baixar</a>
                                 @endif
                             </td>
                         </tr>
